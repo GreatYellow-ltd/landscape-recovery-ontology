@@ -40,12 +40,14 @@ landscape-recovery-ontology/
 ├─ examples/
 │ ├─ sample-data.ttl
 │ └─ queries/
-│ ├─ q1_soil_measurements.rq
-│ ├─ q2_total_hectarage.rq
-│ ├─ q3_chalk_grassland_owners.rq
-│ └─ q4_area_weighted_condition.rq
+│   ├─ q1_soil_measurements.rq
+│   ├─ q2_total_hectarage.rq
+│   ├─ q3_chalk_grassland_owners.rq
+│   └─ q4_area_weighted_condition.rq
 └─ docs/
-└─ ontology-diagram.png
+  ├─ class-hierarchy-poc.svg
+  ├─ dependencies-poc.svg
+  └─ ontology-diagram.png
 ```
 
 ## Install / Use
@@ -71,6 +73,61 @@ References: SOSA/SSN, GeoSPARQL 1.1, QUDT, OWL-Time, DOAP (example of publishing
 ## Diagram
 
 ![Ontology diagram](docs/ontology-diagram.png)
+
+## Class Hierarchy
+```
+owl:Thing
+├─ lro:Programme                (schema:Program)
+├─ lro:Project                  (schema:Project)
+├─ lro:Meeting                  (schema:Event)
+
+├─ lro:Site                     (geo:Feature)
+│  └─ (holds parcels via lro:hasParcel)
+
+├─ lro:LandParcel               (geo:Feature)
+│  ├─ (has geometry via geo:hasGeometry → geo:Geometry)
+│  ├─ (classified via lro:hasUKHab → skos:Concept)
+│  └─ (owner via lro:owner → foaf:Agent)
+
+├─ lro:Watershed                (geo:Feature)
+├─ lro:Location                 (dcterms:Location ∧ geo:Feature)
+
+├─ lro:Visitor                  (foaf:Person)
+├─ lro:Ecologist                (foaf:Person)
+├─ lro:Investor                 (foaf:Person)
+├─ lro:Farmer                   (foaf:Person)
+
+├─ lro:Invoice                  (schema:Invoice)
+│  └─ (uses lro:amount → qudt:QuantityValue)
+
+├─ lro:MonetaryValue            (qudt:QuantityValue)
+
+├─ lro:LegalDocument            (dcterms:Document)
+├─ lro:FinancialModel           (dcterms:Document)
+├─ lro:HydrologicalModel        (dcterms:Document)
+├─ lro:TemplateDocument         (dcterms:Document)
+
+├─ lro:HabitatType              (envo:ENVO_00002006)           ; ENVO habitat
+├─ lro:EcosystemService         (owl:Class)
+├─ lro:EcosystemFunction        (owl:Class)
+├─ lro:EcosystemValue           (owl:Class)
+
+├─ lro:SoilSample               (sosa:Sample)
+├─ lro:WaterSample              (sosa:Sample)
+├─ lro:AirSample                (sosa:Sample)
+
+├─ lro:SpeciesObservation       (sosa:Observation)
+│  └─ (links taxon via lro:observedSpecies → dwc:Taxon)
+
+├─ lro:EvaluationMethod         (sosa:Procedure)
+├─ lro:HabitatQualityAssessment (sosa:Observation)
+
+# Reused “upper” classes (referenced, not expanded here):
+#   geo:Feature, geo:Geometry, sosa:Observation, sosa:Sample, sosa:Procedure,
+#   qudt:QuantityValue, time:Interval, dcterms:Document, dcat:Dataset,
+#   foaf:Person, org:Organization, gn:Region, dwc:Taxon, envo:ENVO_00002006
+
+```
 
 ## SPARQL examples (same as in `examples/queries/`)
 
@@ -98,3 +155,20 @@ Issues and pull requests are welcome—particularly:
 - SKOS expansion/mapping for **UKHab**  
 - Additional **Evaluation Methods** and example datasets  
 - Tests for query patterns and unit conversions via QUDT
+
+## References
+## References
+
+- Noy, N. F., & McGuinness, D. L. (2001). **Ontology Development 101: A Guide to Creating Your First Ontology.** Stanford KSL/Protégé. PDF. https://protege.stanford.edu/publications/ontology_development/ontology101.pdf  :contentReference[oaicite:0]{index=0}
+
+- Ceccaroni, L., & Oliva, L. (2012). **Ontologies for the Design of Ecosystems.** In *Universal Ontology of Geographic Space: Semantic Enrichment for Spatial Data* (IGI Global). Chapter PDF/TOC: https://igiprodst.blob.core.windows.net/ancillary-files/9781466603271.pdf  (overview page: https://www.igi-global.com/viewtitle.aspx?TitleId=64001).  :contentReference[oaicite:1]{index=1}
+
+- **BFO-2020** (Basic Formal Ontology) — GitHub repository for artifacts conformant with ISO/IEC 21838-2:2020: https://github.com/BFO-ontology/BFO-2020  :contentReference[oaicite:2]{index=2}
+
+- Drakou, E. G., Lemmens, R. L. G., & Ayuninshih, F. (2019). **Designing an Ecosystem Services Ontology within GEOBON.** *Biodiversity Information Science and Standards* 3: e36338. DOI: 10.3897/biss.3.36338. (UTwente record: https://research.utwente.nl/en/publications/designing-an-ecosystem-services-ontology-within-geobon)  :contentReference[oaicite:3]{index=3}
+
+- Bennett, B. (2010). **Foundations for an Ontology of Environment and Habitat.** In *FOIS 2010: Formal Ontology in Information Systems* (IOS Press), pp. 31–44. (ACM/IOS references and metadata)  https://dl.acm.org/doi/proceedings/10.5555/1804715  :contentReference[oaicite:4]{index=4}
+
+- Buttigieg, P. L., et al. (2016). **The environment ontology in 2016: bridging domains with increased scope, semantic density, and interoperation.** *Journal of Biomedical Semantics*. https://jbiomedsem.biomedcentral.com/articles/10.1186/s13326-016-0097-6  :contentReference[oaicite:5]{index=5}
+
+- Affinito, F., Holzer, J. M., Fortin, M.-J., & Gonzalez, A. (2025). **Towards a unified ontology for monitoring ecosystem services.** *Ecosystem Services*. ScienceDirect article page: https://www.sciencedirect.com/science/article/pii/S2212041625000300  :contentReference[oaicite:6]{index=6}
