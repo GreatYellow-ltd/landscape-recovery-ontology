@@ -1,0 +1,11 @@
+PREFIX lro:  <https://greatyellow.earth/ontology#>
+
+SELECT ?owner (SUM(?ha) AS ?hectares)
+WHERE {
+  ?parcel a lro:LandParcel ;
+          lro:owner ?owner ;
+          lro:areaHa ?ha ;
+          lro:hasUKHab lro:UKHab_ChalkGrassland .
+}
+GROUP BY ?owner
+ORDER BY DESC(?hectares)

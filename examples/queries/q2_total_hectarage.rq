@@ -1,0 +1,8 @@
+PREFIX lro: <https://greatyellow.earth/ontology#>
+PREFIX ex:  <https://greatyellow.earth/id/>
+
+SELECT (SUM(?ha) AS ?totalHectares)
+WHERE {
+  ex:projX lro:hasSite/lro:hasParcel ?parcel .
+  ?parcel lro:areaHa ?ha .
+}

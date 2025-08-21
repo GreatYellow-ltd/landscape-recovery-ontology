@@ -1,0 +1,103 @@
+@prefix lro:      <https://greatyellow.earth/ontology#> .
+@prefix ex:       <https://greatyellow.earth/id/> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix sosa:     <http://www.w3.org/ns/sosa/> .
+@prefix qudt:     <http://qudt.org/schema/qudt/> .
+@prefix unit:     <http://qudt.org/vocab/unit/> .
+@prefix currency: <http://qudt.org/vocab/currency/> .
+@prefix geo:      <http://www.opengis.net/ont/geosparql#> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix org:      <http://www.w3.org/ns/org#> .
+@prefix foaf:     <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+
+# Programme / Project
+ex:prog1 a lro:Programme ; rdfs:label "Landscape Recovery Pilot" .
+ex:projX a lro:Project ;
+  rdfs:label "Project X" ;
+  lro:inProgramme ex:prog1 ;
+  lro:status lro:Status_Active .
+
+# Site with parcels
+ex:siteA a lro:Site ; rdfs:label "Site A" .
+ex:projX lro:hasSite ex:siteA .
+
+# Owners
+ex:AcmeFarms a org:Organization ; foaf:name "Acme Farms Ltd." .
+ex:DownlandTrust a org:Organization ; foaf:name "Downland Trust" .
+
+# Parcel 1 (chalk grassland)
+ex:p1 a lro:LandParcel ;
+  lro:parcelId "LP-0001" ;
+  lro:areaHa 12.5 ;
+  lro:conditionScore 0.72 ;
+  lro:hasUKHab lro:UKHab_ChalkGrassland ;
+  lro:owner ex:AcmeFarms ;
+  geo:hasGeometry ex:p1_geom .
+
+# Parcel 2 (grassland L1)
+ex:p2 a lro:LandParcel ;
+  lro:parcelId "LP-0002" ;
+  lro:areaHa 8.7 ;
+  lro:conditionScore 0.65 ;
+  lro:hasUKHab lro:UKHab_L1_Grassland ;
+  lro:owner ex:DownlandTrust ;
+  geo:hasGeometry ex:p2_geom .
+
+# Geometries (WKT + GeoJSON) — EPSG:4326
+ex:p1_geom a geo:Geometry ;
+  geo:asWKT "<http://www.opengis.net/def/crs/EPSG/0/4326> POLYGON((-1.5 51.3, -1.5 51.31, -1.49 51.31, -1.49 51.3, -1.5 51.3))"^^geo:wktLiteral ;
+  geo:asGeoJSON "{\"type\":\"Polygon\",\"coordinates\":[[[-1.5,51.3],[-1.5,51.31],[-1.49,51.31],[-1.49,51.3],[-1.5,51.3]]]}"^^geo:geoJSONLiteral .
+
+ex:p2_geom a geo:Geometry ;
+  geo:asWKT "<http://www.opengis.net/def/crs/EPSG/0/4326> POLYGON((-1.48 51.3, -1.48 51.31, -1.47 51.31, -1.47 51.3, -1.48 51.3))"^^geo:wktLiteral ;
+  geo:asGeoJSON "{\"type\":\"Polygon\",\"coordinates\":[[[-1.48,51.3],[-1.48,51.31],[-1.47,51.31],[-1.47,51.3],[-1.48,51.3]]]}"^^geo:geoJSONLiteral .
+
+# Link parcels to site
+ex:siteA lro:hasParcel ex:p1, ex:p2 .
+
+# Soil samples and observations for Project X
+ex:soilS1 a lro:SoilSample ; lro:sampleOfParcel ex:p1 .
+ex:soilS2 a lro:SoilSample ; lro:sampleOfParcel ex:p1 .
+ex:soilS3 a lro:SoilSample ; lro:sampleOfParcel ex:p2 .
+
+# Observations with QUDT values
+ex:obs1 a sosa:Observation ;
+  lro:partOfProject ex:projX ;
+  sosa:hasFeatureOfInterest ex:soilS1 ;
+  sosa:resultTime "2023-05-10T09:00:00Z"^^xsd:dateTime ;
+  sosa:hasResult ex:qv1 .
+
+ex:qv1 a qudt:QuantityValue ;
+  qudt:numericValue "2.8"^^xsd:decimal ;
+  qudt:unit unit:PERCENT .
+
+ex:obs2 a sosa:Observation ;
+  lro:partOfProject ex:projX ;
+  sosa:hasFeatureOfInterest ex:soilS2 ;
+  sosa:resultTime "2024-09-15T10:00:00Z"^^xsd:dateTime ;
+  sosa:hasResult ex:qv2 .
+
+ex:qv2 a qudt:QuantityValue ;
+  qudt:numericValue "3.1"^^xsd:decimal ;
+  qudt:unit unit:PERCENT .
+
+# Outside the filter window (for testing)
+ex:obs_old a sosa:Observation ;
+  lro:partOfProject ex:projX ;
+  sosa:hasFeatureOfInterest ex:soilS3 ;
+  sosa:resultTime "2021-07-01T12:00:00Z"^^xsd:dateTime ;
+  sosa:hasResult ex:qv_old .
+
+ex:qv_old a qudt:QuantityValue ;
+  qudt:numericValue "2.2"^^xsd:decimal ;
+  qudt:unit unit:PERCENT .
+
+# Finance example
+ex:inv100 a lro:Invoice ;
+  lro:relatesToProject ex:projX ;
+  lro:amount ex:inv100_amt .
+
+ex:inv100_amt a qudt:QuantityValue ;
+  qudt:numericValue "15000"^^xsd:decimal ;
+  qudt:unit currency:GBP .

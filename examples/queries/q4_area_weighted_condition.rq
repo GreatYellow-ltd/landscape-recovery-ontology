@@ -1,0 +1,15 @@
+PREFIX lro:  <https://greatyellow.earth/ontology#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX ex:   <https://greatyellow.earth/id/>
+
+SELECT ?l1 (SUM(?area * ?cond) / SUM(?area) AS ?areaWeightedAvgCondition)
+WHERE {
+  ex:projX lro:hasSite/lro:hasParcel ?parcel .
+  ?parcel lro:areaHa ?area ;
+          lro:conditionScore ?cond ;
+          lro:hasUKHab ?hab .
+  ?hab (skos:broader)* ?l1 .
+  ?l1 skos:topConceptOf lro:UKHabScheme .
+}
+GROUP BY ?l1
+ORDER BY ?l1

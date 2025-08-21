@@ -1,0 +1,20 @@
+PREFIX lro:  <https://greatyellow.earth/ontology#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX qudt: <http://qudt.org/schema/qudt/>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX ex:   <https://greatyellow.earth/id/>
+
+SELECT ?obs ?when ?value ?unit
+WHERE {
+  VALUES ?project { ex:projX }   # swap this for your project URI
+  ?obs a sosa:Observation ;
+       lro:partOfProject ?project ;
+       sosa:hasFeatureOfInterest ?sample ;
+       sosa:resultTime ?when ;
+       sosa:hasResult ?qv .
+  ?sample a lro:SoilSample .
+  ?qv qudt:numericValue ?value ; qudt:unit ?unit .
+  FILTER (?when >= "2022-01-01T00:00:00Z"^^xsd:dateTime &&
+          ?when <  "2026-01-01T00:00:00Z"^^xsd:dateTime)
+}
+ORDER BY ?when
