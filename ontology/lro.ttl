@@ -427,6 +427,12 @@ lro:Community   rdfs:seeAlso lro:Principle_SpeciesInteractions .
 lro:Population  rdfs:seeAlso lro:Principle_Abundance .
 lro:Individual  rdfs:seeAlso lro:Principle_Species , lro:Principle_Counts .
 
+lro:hasParcel owl:equivalentProperty lro:hasLandParcel .
+lro:areaHa owl:equivalentProperty lro:areaHectares .
+lro:conditionScore owl:equivalentProperty lro:habitatConditionScore .
+lro:hasEvaluation owl:inverseOf lro:evaluatesFeature .
+lro:partOf owl:propertyChainAxiom ( lro:observesSample lro:partOf ) .
+
 #################################################################
 # 9) UKHab (placeholder SKOS scheme & a couple of concepts)
 #################################################################

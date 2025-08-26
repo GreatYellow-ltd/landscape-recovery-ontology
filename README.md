@@ -180,6 +180,91 @@ owl:Thing
 - **Q7**: For each LandParcel, which evaluation methods were used and when?  
 - **Q8**: For each Invoice, what kind(s) of thing is it charging for (measurement, product, service, site, farm, project)?  
 
+## Expected results (quick check)
+
+> These results assume both datasets are loaded:
+> - `examples/sample-data.ttl`
+> - `examples/sample-data-extended.ttl`
+>
+> and a standard OWL 2 RL reasoner is enabled (needed for Q6 rollups).  
+> Prefixes: `ex:` = `https://greatyellow.earth/example#`, `lro:` = `https://greatyellow.earth/ontology#`, `unit:` = `http://qudt.org/vocab/unit/`.
+
+<details>
+<summary><strong>Q1</strong> soil measurements in a project</summary>
+
+| obs     | when (UTC)            | value | unit          |
+|--------|------------------------|-------|---------------|
+| ex:obs1 | 2023-05-10T09:00:00Z  | 2.8   | unit:PERCENT  |
+</details>
+
+<details>
+<summary><strong>Q2</strong> total hectares under a project</summary>
+
+| totalHectares |
+|---------------|
+| 21.2          |
+</details>
+
+<details>
+<summary><strong>Q3</strong> chalk grassland owners</summary>
+
+| owner          | hectares |
+|----------------|----------|
+| ex:AcmeFarms   | 12.5     |
+</details>
+
+<details>
+<summary><strong>Q4</strong> area-weighted habitat condition (by UKHab L1)</summary>
+
+| l1                          | areaWeightedAvgCondition                 |
+|-----------------------------|------------------------------------------|
+| lro:UKHab_L1_Grassland      | 0.691273584905660377358491               |
+</details>
+
+<details>
+<summary><strong>Q5</strong> people & memberships / participation</summary>
+
+| person  | personName   | affiliation             | type        |
+|---------|--------------|-------------------------|-------------|
+| ex:tim  | Tim Someone  | ex:GreatYellowCompany   | memberOf    |
+| ex:tim  | Tim Someone  | ex:ELRProject           | memberOf    |
+| ex:tim  | Tim Someone  | ex:ElmTreeFarm          | memberOf    |
+</details>
+
+<details>
+<summary><strong>Q6</strong> samples that roll up to containers (via partonomy)</summary>
+
+| sample      | container          | containerType   |
+|-------------|--------------------|-----------------|
+| ex:SampleA  | ex:SouthFieldSite  | lro:Site        |
+| ex:SampleA  | ex:ElmTreeFarm     | lro:Farm        |
+| ex:SampleA  | ex:ELRProject      | lro:Project     |
+| ex:SampleA  | ex:ELRProgramme    | lro:Programme   |
+
+<em>Note:</em> requires reasoning over <code>sampleOfParcel ∘ partOf ⊑ partOf</code>.
+</details>
+
+<details>
+<summary><strong>Q7</strong> parcel evaluations (method & time)</summary>
+
+| parcel      | eval      | method            | when (UTC)            |
+|-------------|-----------|-------------------|-----------------------|
+| ex:ParcelA  | ex:Eval1  | ex:VESS_Procedure | 2024-09-15T09:00:00Z  |
+
+<em>Tip:</em> works either with the UNION pattern or with <code>lro:hasEvaluation owl:inverseOf lro:evaluatesFeature</code> + reasoning.
+</details>
+
+<details>
+<summary><strong>Q8</strong> invoice kinds</summary>
+
+| invoice       | kinds           |
+|---------------|-----------------|
+| ex:Invoice1   | measurement     |
+| ex:Invoice2   | site, product   |
+
+<em>Note:</em> Order in <code>GROUP_CONCAT</code> may vary by engine.
+</details>
+
 ## Versioning & releases
 
 - Version IRI: `https://greatyellow.earth/ontology/0.1.0`
