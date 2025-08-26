@@ -1,0 +1,11 @@
+PREFIX lro: <https://greatyellow.earth/ontology#>
+PREFIX sosa:<http://www.w3.org/ns/sosa/>
+
+SELECT DISTINCT ?sample ?container ?containerType
+WHERE {
+  ?sample a sosa:Sample ;
+          lro:partOf ?container .
+  VALUES ?containerType { lro:Site lro:Farm lro:Project lro:Programme }
+  ?container a ?containerType .
+}
+ORDER BY ?container ?sample

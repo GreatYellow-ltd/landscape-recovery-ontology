@@ -1,0 +1,107 @@
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix lro:  <https://greatyellow.earth/ontology#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix geo:  <http://www.opengis.net/ont/geosparql#> .
+@prefix org:  <http://www.w3.org/ns/org#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix time: <http://www.w3.org/2006/time#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix schema: <https://schema.org/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+##############################
+# Node shapes
+##############################
+
+lro:AreaShape a sh:NodeShape ;
+  sh:targetClass lro:Area ;
+  sh:property [
+    sh:path geo:hasGeometry ;
+    sh:minCount 0 ;  # optional, but must be Geometry if present
+    sh:class geo:Geometry
+  ] .
+
+lro:FarmShape a sh:NodeShape ;
+  sh:targetClass lro:Farm ;
+  sh:property [
+    sh:path lro:hasSiteOfFarm ;
+    sh:nodeKind sh:IRI ;
+    sh:class lro:Site ;
+    sh:minCount 0
+  ] .
+
+lro:LandParcelShape a sh:NodeShape ;
+  sh:targetClass lro:LandParcel ;
+  sh:property [
+    sh:path lro:hasEvaluation ;
+    sh:class lro:ParcelEvaluation ;
+    sh:minCount 0
+  ] .
+
+lro:ObservationShape a sh:NodeShape ;
+  sh:targetClass sosa:Observation ;
+  sh:property [
+    sh:path lro:observesSample ;
+    sh:class sosa:Sample ;
+    sh:minCount 1
+  ] .
+
+lro:SampleShape a sh:NodeShape ;
+  sh:targetClass sosa:Sample ;
+  sh:property [
+    sh:path lro:sampleOfParcel ;
+    sh:class lro:LandParcel ;
+    sh:minCount 1
+  ] .
+
+lro:ParcelEvaluationShape a sh:NodeShape ;
+  sh:targetClass lro:ParcelEvaluation ;
+  sh:property [
+    sh:path lro:evaluatesFeature ;
+    sh:class lro:LandParcel ;
+    sh:minCount 1
+  ] ;
+  sh:property [
+    sh:path lro:usedEvaluationMethod ;
+    sh:class sosa:Procedure ;
+    sh:minCount 1
+  ] ;
+  sh:property [
+    sh:path lro:hasEvaluationTime ;
+    sh:class time:TemporalEntity ;
+    sh:minCount 0
+  ] .
+
+lro:InvoiceShape a sh:NodeShape ;
+  sh:targetClass lro:Invoice ;
+  sh:property [
+    sh:path lro:amount ;
+    sh:class qudt:QuantityValue ;
+    sh:minCount 1
+  ] ;
+  sh:property [
+    sh:path lro:invoiceFor ;
+    sh:minCount 1 ;
+    sh:or (
+      [ sh:class sosa:Observation ]
+      [ sh:class sosa:Sample ]
+      [ sh:class sosa:Procedure ]
+      [ sh:class lro:Site ]
+      [ sh:class lro:Farm ]
+      [ sh:class lro:Project ]
+      [ sh:class schema:Product ]
+      [ sh:class schema:Service ]
+    )
+  ] .
+
+lro:MembershipShape a sh:NodeShape ;
+  sh:targetClass foaf:Person ;
+  sh:property [
+    sh:path lro:isMemberOf ;
+    sh:minCount 0 ;
+    sh:or (
+      [ sh:class lro:Farm ]
+      [ sh:class org:Organization ]
+      [ sh:class lro:Project ]
+    )
+  ] .

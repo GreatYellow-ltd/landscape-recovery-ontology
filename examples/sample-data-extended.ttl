@@ -1,0 +1,76 @@
+@prefix lro:   <https://greatyellow.earth/ontology#> .
+@prefix ex:    <https://greatyellow.earth/example#> .
+@prefix sosa:  <http://www.w3.org/ns/sosa/> .
+@prefix geo:   <http://www.opengis.net/ont/geosparql#> .
+@prefix org:   <http://www.w3.org/ns/org#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix schema:<https://schema.org/> .
+@prefix time:  <http://www.w3.org/2006/time#> .
+@prefix qudt:  <http://qudt.org/schema/qudt/> .
+@prefix unit:  <http://qudt.org/vocab/unit/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+##### People
+ex:tim   a foaf:Person, lro:Farmer, lro:Investor ;
+  foaf:name "Tim Coates" ;
+  lro:isMemberOf ex:GreatYellowCompany, ex:ELRProject, ex:ElmTreeFarm .
+
+##### Organizations & projects
+ex:GreatYellowCompany a org:Organization ;
+  foaf:name "Great Yellow Company" .
+
+ex:ELRProgramme a lro:Programme ;
+  rdfs:label "ELR Programme" ;
+  lro:hasProject ex:ELRProject .
+
+ex:ELRProject a lro:Project ;
+  rdfs:label "ELR Project" ;
+  lro:hasFarm ex:ElmTreeFarm ;
+  lro:hasSite ex:SouthFieldSite .
+
+##### Farm as BOTH area & organization with geometry
+ex:ElmTreeFarm a lro:Farm ;
+  foaf:name "Elm Tree Farm" ;
+  geo:hasGeometry [ a geo:Geometry ;
+                    geo:asWKT "POLYGON((-2.0 52.0, -2.0 52.01, -1.99 52.01, -1.99 52.0, -2.0 52.0))"^^geo:wktLiteral ] ;
+  lro:hasSiteOfFarm ex:SouthFieldSite .
+
+##### Site and parcel
+ex:SouthFieldSite a lro:Site ;
+  rdfs:label "South Field" ;
+  lro:hasLandParcel ex:ParcelA .
+
+ex:ParcelA a lro:LandParcel ;
+  rdfs:label "Parcel A" .
+
+##### Sampling, observation
+ex:SampleA a lro:SoilSample ;
+  lro:sampleOfParcel ex:ParcelA .
+
+ex:ObsA a lro:SpeciesObservation ;
+  lro:observesSample ex:SampleA ;
+  sosa:observedProperty ex:SoilOrganicCarbon ;
+  sosa:hasSimpleResult "4.3"^^xsd:decimal ;
+  sosa:resultTime "2024-10-21T10:00:00Z"^^xsd:dateTime .
+
+##### Parcel evaluation (n-ary)
+ex:Eval1 a lro:ParcelEvaluation ;
+  lro:evaluatesFeature ex:ParcelA ;
+  lro:usedEvaluationMethod ex:VESS_Procedure ;
+  lro:hasEvaluationTime [ a time:Instant ; time:inXSDDateTime "2024-09-15T09:00:00Z"^^xsd:dateTime ] .
+
+ex:VESS_Procedure a lro:EvaluationMethod ;
+  rdfs:label "Visual Evaluation of Soil Structure (VESS)" .
+
+##### Invoices (no line-items)
+ex:Invoice1 a lro:Invoice ;
+  lro:amount [ a qudt:QuantityValue ; qudt:numericValue "250"^^xsd:decimal ; qudt:unit unit:GBP ] ;
+  lro:invoiceFor ex:ObsA ;     # charged for a measurement process
+  lro:relatesToProject ex:ELRProject .
+
+ex:SeedMix123 a schema:Product ; schema:name "Chalk Grassland Mix" .
+
+ex:Invoice2 a lro:Invoice ;
+  lro:amount [ a qudt:QuantityValue ; qudt:numericValue "480"^^xsd:decimal ; qudt:unit unit:GBP ] ;
+  lro:invoiceFor ex:SeedMix123, ex:SouthFieldSite ; # purchase for a site
+  lro:relatesToProject ex:ELRProject .

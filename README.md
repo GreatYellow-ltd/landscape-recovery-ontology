@@ -6,6 +6,8 @@ A lightweight, standards-first ontology for **nature finance & landscape recover
 - **Primary serialization:** Turtle (`ontology/lro.ttl`)
 - **Assumptions:** Currency **GBP**, CRS **EPSG:4326**, WKT and GeoJSON stored side-by-side.
 
+---
+
 > **Announcement / Press Release**  
 > 🚀 **Introducing the Landscape Recovery Ontology (LRO)**  
 > Today we’re open-sourcing a lightweight ontology for **nature finance & landscape recovery**. It reuses the good stuff—**SOSA/SSN** (observations), **GeoSPARQL 1.1** (geometries), **QUDT** (units), **OWL-Time**, **FOAF/ORG**, **DCTERMS/DCAT/SKOS**—and adds just enough glue for projects, parcels, habitats (UKHab), and measurements.  
@@ -16,11 +18,40 @@ A lightweight, standards-first ontology for **nature finance & landscape recover
 > • “Which landowners have the most chalk grassland?”  
 > • “Area-weighted habitat condition by L1 UKHab”  
 >  
-> Get started in **Protégé** with the Turtle file, sample data, and ready-to-run SPARQL queries. Ontology & docs are **CC BY 4.0**; example code is **MIT**.  
+> Get started in **Protégé** (or **GraphDB**) with the Turtle file, sample data, and ready-to-run SPARQL queries. Ontology & docs are **CC BY 4.0**; example code is **MIT**.  
 >  
 > 📣 We’d love feedback, issues, and contributions—especially mappings to UKHab codes and additional evaluation methods.  
 >  
 > #ontology #semanticweb #geospatial #biodiversity #naturefinance #geosparql #qudt #openscience
+
+---
+
+## What’s new (since 0.1.x)
+
+**Geospatial “Area” model & partonomy**
+- New upper class `lro:Area ⊑ geo:Feature`.  
+- `lro:Farm`, `lro:Site`, `lro:LandParcel`, `lro:Watershed` are all `lro:Area` (so they can all carry geometry).  
+- Generic, transitive `lro:hasPart / lro:partOf` with domain-specific subproperties:  
+  `lro:hasProject`, `lro:hasFarm`, `lro:hasSite`, `lro:hasLandParcel`.  
+- **Property chain**: `lro:sampleOfParcel ∘ lro:partOf ⊑ lro:partOf` → a sample taken on a parcel is (by inference) part of the containing Site, Farm, Project, Programme.
+
+**Farm is both place *and* business**
+- `lro:Farm ⊑ lro:Area ∧ org:Organization ∧ schema:Place`.  
+- People can be members of Farms/Companies/Projects via `lro:isMemberOf` / `lro:hasMember`.  
+- For project-specific involvement you can also use `lro:participatesIn` / `lro:hasParticipant`.
+
+**Sampling, observations, and parcel evaluations**
+- A sample is tied to a parcel: `lro:sampleOfParcel(sosa:Sample → lro:LandParcel)`.  
+- Observations point to the **sample**: `lro:observesSample ⊑ sosa:hasFeatureOfInterest`.  
+- N-ary event pattern for **parcel evaluations**: `lro:ParcelEvaluation ⊑ sosa:Sampling` with  
+  `lro:hasEvaluation( LandParcel→ParcelEvaluation )`,  
+  `lro:usedEvaluationMethod ⊑ sosa:usedProcedure`,  
+  `lro:hasEvaluationTime ⊑ time:hasTime`.  
+  And `lro:EvaluationMethod ≡ sosa:Procedure`.
+
+**Invoices without line-items**
+- `lro:Invoice ⊑ schema:Invoice` with value via `lro:amount → qudt:QuantityValue`.  
+- Generic `lro:invoiceFor` targets any billable thing (measurement, procedure, Site/Farm/Project, product/service)—no separate line-item class.
 
 ---
 
@@ -39,25 +70,34 @@ landscape-recovery-ontology/
 │ └─ lro.ttl
 ├─ examples/
 │ ├─ sample-data.ttl
+│ ├─ sample-data-extended.ttl
 │ └─ queries/
 │   ├─ q1_soil_measurements.rq
 │   ├─ q2_total_hectarage.rq
 │   ├─ q3_chalk_grassland_owners.rq
-│   └─ q4_area_weighted_condition.rq
-└─ docs/
-  ├─ class-hierarchy-poc.svg
-  ├─ dependencies-poc.svg
-  └─ ontology-diagram.png
+│   ├─ q4_area_weighted_condition.rq
+│   ├─ q5_membership.rq # ← NEW
+│   ├─ q6_samples_rollup.rq # ← NEW
+│   ├─ q7_parcel_evaluations.rq # ← NEW
+│   └─ q8_invoices.rq # ← NEW
+├─ docs/
+│ ├─ class-hierarchy-poc.svg
+│ ├─ dependencies-poc.svg
+│ └─ ontology-diagram.png
+└─ shapes/
+  └─ lro.shacl.ttl
 ```
 
 ## Install / Use
 
-1. **Open in Protégé**  
+1. **Open in Protégé** (or **GraphDB**) 
    - File → Open… → `ontology/lro.ttl`
 2. **Load the sample data**  
    - File → Import RDF… → `examples/sample-data.ttl`
 3. **Run queries**  
    - Use SPARQL tab in Protégé to run examples from `examples/queries/`.
+4) **Validate with SHACL (optional)**  
+   Load `shapes/lro.shacl.ttl` in your triple store (e.g., GraphDB → Shapes). Validate dataset.
 
 ## Core dependencies (reused vocabularies)
 
@@ -74,7 +114,7 @@ References: SOSA/SSN, GeoSPARQL 1.1, QUDT, OWL-Time, DOAP (example of publishing
 
 ![Ontology diagram](docs/ontology-diagram.png)
 
-## Class Hierarchy
+## Class Hierarchy (partial)
 ```
 owl:Thing
 ├─ lro:Programme                (schema:Program)
@@ -129,12 +169,16 @@ owl:Thing
 
 ```
 
-## SPARQL examples (same as in `examples/queries/`)
+## SPARQL examples / Competency Questions (same as in `examples/queries/`)
 
-- **Q1** – Soil measurements for *Project X* between 2022 and 2025  
-- **Q2** – Aggregate hectarage for parcels under *Project X*  
-- **Q3** – Landowners with the highest area of chalk grassland  
-- **Q4** – Area-weighted average habitat condition by L1 UKHab in *Project X*
+- **Q1**: Soil measurements for *Project X* between 2022 and 2025  
+- **Q2**: Aggregate hectarage for parcels under *Project X*  
+- **Q3**: Landowners with the highest area of chalk grassland  
+- **Q4**: Area-weighted average habitat condition by L1 UKHab in *Project X*
+- **Q5**: Which people are members of which Farms, Companies, or Projects?  
+- **Q6**: Which Samples roll up (via the partonomy) to Sites, Farms, Projects, and Programmes?  
+- **Q7**: For each LandParcel, which evaluation methods were used and when?  
+- **Q8**: For each Invoice, what kind(s) of thing is it charging for (measurement, product, service, site, farm, project)?  
 
 ## Versioning & releases
 
@@ -156,7 +200,6 @@ Issues and pull requests are welcome—particularly:
 - Additional **Evaluation Methods** and example datasets  
 - Tests for query patterns and unit conversions via QUDT
 
-## References
 ## References
 
 - Noy, N. F., & McGuinness, D. L. (2001). **Ontology Development 101: A Guide to Creating Your First Ontology.** Stanford KSL/Protégé. PDF. https://protege.stanford.edu/publications/ontology_development/ontology101.pdf  :contentReference[oaicite:0]{index=0}

@@ -1,0 +1,11 @@
+PREFIX lro: <https://greatyellow.earth/ontology#>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+
+SELECT ?person ?personName ?affiliation ?type
+WHERE {
+  ?person a foaf:Person ; foaf:name ?personName .
+  { ?person lro:isMemberOf ?affiliation . BIND("memberOf" AS ?type) }
+  UNION
+  { ?person lro:participatesIn ?affiliation . BIND("participatesIn" AS ?type) }
+}
+ORDER BY ?personName ?type

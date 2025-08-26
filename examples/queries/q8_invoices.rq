@@ -1,0 +1,18 @@
+PREFIX lro:   <https://greatyellow.earth/ontology#>
+PREFIX sosa:  <http://www.w3.org/ns/sosa/>
+PREFIX schema:<https://schema.org/>
+
+SELECT ?invoice (GROUP_CONCAT(DISTINCT ?kind; SEPARATOR=", ") AS ?kinds)
+WHERE {
+  ?invoice a lro:Invoice ; lro:invoiceFor ?thing .
+  BIND(
+    IF(EXISTS { ?thing a sosa:Observation }, "measurement",
+      IF(EXISTS { ?thing a schema:Product }, "product",
+        IF(EXISTS { ?thing a schema:Service }, "service",
+          IF(EXISTS { ?thing a lro:Site }, "site",
+            IF(EXISTS { ?thing a lro:Farm }, "farm",
+              IF(EXISTS { ?thing a lro:Project }, "project", "other"))))))
+    AS ?kind)
+}
+GROUP BY ?invoice
+ORDER BY ?invoice

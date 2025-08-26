@@ -1,0 +1,16 @@
+PREFIX lro:  <https://greatyellow.earth/ontology#>
+PREFIX time: <http://www.w3.org/2006/time#>
+
+SELECT ?parcel ?eval ?method ?when
+WHERE {
+  { ?parcel lro:hasEvaluation ?eval }
+  UNION
+  { ?eval lro:evaluatesFeature ?parcel }
+
+  ?eval lro:usedEvaluationMethod ?method .
+  OPTIONAL {
+    ?eval lro:hasEvaluationTime ?t .
+    OPTIONAL { ?t time:inXSDDateTime ?when }
+  }
+}
+ORDER BY ?parcel ?when

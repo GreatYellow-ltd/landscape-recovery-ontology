@@ -1,41 +1,53 @@
-@prefix lro:      <https://greatyellow.earth/ontology#> .
-@prefix owl:      <http://www.w3.org/2002/07/owl#> .
-@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
-@prefix dcterms:  <http://purl.org/dc/terms/> .
-@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
-@prefix foaf:     <http://xmlns.com/foaf/0.1/> .
-@prefix org:      <http://www.w3.org/ns/org#> .
-@prefix schema:   <https://schema.org/> .
-@prefix sosa:     <http://www.w3.org/ns/sosa/> .
-@prefix time:     <http://www.w3.org/2006/time#> .
-@prefix geo:      <http://www.opengis.net/ont/geosparql#> .
-@prefix dcat:     <http://www.w3.org/ns/dcat#> .
-@prefix qudt:     <http://qudt.org/schema/qudt/> .
-@prefix unit:     <http://qudt.org/vocab/unit/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dwc: <http://rs.tdwg.org/dwc/terms/> .
+@prefix envo: <http://purl.obolibrary.org/obo/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix geo: <http://www.opengis.net/ont/geosparql#> .
+@prefix gn: <http://www.geonames.org/ontology#> .
+@prefix lro: <https://greatyellow.earth/ontology#> .
+@prefix org: <http://www.w3.org/ns/org#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <https://schema.org/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix time: <http://www.w3.org/2006/time#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
 @prefix currency: <http://qudt.org/vocab/currency/> .
-@prefix gn:       <http://www.geonames.org/ontology#> .
-@prefix dwc:      <http://rs.tdwg.org/dwc/terms/> .
-@prefix envo:     <http://purl.obolibrary.org/obo/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 #################################################################
 # Ontology header
 #################################################################
 
-<https://greatyellow.earth/ontology>
-  a owl:Ontology ;
+<https://greatyellow.earth/ontology> a owl:Ontology ;
   dcterms:title "Landscape Recovery Ontology (LRO)" ;
   dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
-  owl:versionIRI <https://greatyellow.earth/ontology/0.2.0> ;
-  owl:versionInfo "0.2.0 (2025-08-26)" ;
-  rdfs:comment "Lightweight ontology for nature finance & landscape recovery. Reuses SOSA/SSN, GeoSPARQL 1.1, OWL-Time, QUDT, FOAF/ORG, DCTERMS/DCAT/SKOS. This version integrates a simple 'Landscapes' hierarchy (Biome→Ecoregion→Landscape) with area, ecosystem, and temporal context." ;
-  dcterms:source <https://doi.org/10.1016/j.ecocom.2008.04.001> .
+  owl:versionIRI <https://greatyellow.earth/ontology/0.2.1> ;
+  owl:versionInfo "0.2.1 (2025-08-26)" ;
+  rdfs:comment "Lightweight ontology for nature finance & landscape recovery. Aligns geospatial areas with GeoSPARQL features, uses SOSA/SSN for sampling & observations, and supports project/programme hierarchies and invoices." ;
+  dcterms:source <https://doi.org/10.1016/j.ecocom.2008.04.001> ;
+  dcterms:source <https://protege.stanford.edu/publications/ontology_development/ontology101.pdf> ;
+  dcterms:source <https://www.ukhab.org/> .
 
 #################################################################
-# 1) Project & Programme Management
+# GeoSPARQL conveniences
 #################################################################
 
-### Classes
+geo:asGeoJSON a owl:DatatypeProperty .
+geo:asWKT a owl:DatatypeProperty .
+geo:defaultGeometry rdfs:domain geo:Feature ; rdfs:range geo:Geometry .
+geo:hasGeometry a owl:ObjectProperty ; rdfs:domain lro:Area ; rdfs:range geo:Geometry .
+
+dcat:Dataset a owl:Class .
+
+#################################################################
+# 1) Programme & Project
+#################################################################
+
 lro:Programme a owl:Class ;
   rdfs:subClassOf schema:Program ;
   rdfs:label "Programme" .
@@ -48,380 +60,254 @@ lro:Meeting a owl:Class ;
   rdfs:subClassOf schema:Event ;
   rdfs:label "Meeting" .
 
-### Object properties
-lro:inProgramme a owl:ObjectProperty ;
-  rdfs:label "in programme" ;
-  rdfs:domain lro:Project ;
-  rdfs:range  lro:Programme ;
-  rdfs:subPropertyOf dcterms:isPartOf .
+lro:hasProject a owl:ObjectProperty ;
+  rdfs:label "has project" ;
+  rdfs:domain lro:Programme ;
+  rdfs:range  lro:Project ;
+  rdfs:subPropertyOf lro:hasPart .
 
-lro:hasSite a owl:ObjectProperty ;
-  rdfs:label "has site" ;
-  rdfs:domain lro:Project ;
-  rdfs:range  lro:Site .
+lro:partOfProgramme a owl:ObjectProperty ;
+  rdfs:label "part of programme" ;
+  owl:inverseOf lro:hasProject .
 
-### Time for projects
-lro:hasProjectTime a owl:ObjectProperty ;
-  rdfs:label "has project time interval" ;
-  rdfs:domain lro:Project ;
-  rdfs:range  time:Interval ;
-  rdfs:subPropertyOf time:hasTime .
+# Optional: participation separate from membership
+lro:participatesIn a owl:ObjectProperty ;
+  rdfs:label "participates in" ;
+  rdfs:domain foaf:Person ;
+  rdfs:range  lro:Project .
 
-### Project status (SKOS)
-lro:ProjectStatusScheme a skos:ConceptScheme ;
-  skos:prefLabel "Project status (scheme)"@en .
+lro:hasParticipant a owl:ObjectProperty ;
+  rdfs:label "has participant" ;
+  rdfs:domain lro:Project ;
+  rdfs:range  foaf:Person ;
+  owl:inverseOf lro:participatesIn .
 
 lro:status a owl:ObjectProperty ;
   rdfs:label "status" ;
   rdfs:domain lro:Project ;
-  rdfs:range  skos:Concept .
+  rdfs:range skos:Concept .
 
-lro:Status_Planning a skos:Concept ;
-  skos:prefLabel "planning"@en ;
-  skos:inScheme lro:ProjectStatusScheme .
-
-lro:Status_Active a skos:Concept ;
-  skos:prefLabel "active"@en ;
-  skos:inScheme lro:ProjectStatusScheme .
-
-lro:Status_Complete a skos:Concept ;
-  skos:prefLabel "complete"@en ;
-  skos:inScheme lro:ProjectStatusScheme .
+lro:hasProjectTime a owl:ObjectProperty ;
+  rdfs:label "has project time interval" ;
+  rdfs:domain lro:Project ;
+  rdfs:range time:Interval .
 
 #################################################################
-# 2) Geospatial & Environmental Assets
+# 2) People, Roles, Organizations
 #################################################################
 
-### Classes
-lro:Site a owl:Class ;
+lro:Farmer     a owl:Class ; rdfs:subClassOf foaf:Person ; rdfs:label "Farmer" .
+lro:Investor   a owl:Class ; rdfs:subClassOf foaf:Person ; rdfs:label "Investor" .
+lro:Ecologist  a owl:Class ; rdfs:subClassOf foaf:Person ; rdfs:label "Ecologist" .
+lro:Visitor    a owl:Class ; rdfs:subClassOf foaf:Person ; rdfs:label "Visitor" .
+
+# Generic membership that covers Farms, Companies, Projects
+lro:isMemberOf a owl:ObjectProperty ;
+  rdfs:label "is member of" ;
+  rdfs:domain foaf:Person ;
+  rdfs:range [ a owl:Class ;
+               owl:unionOf ( lro:Farm org:Organization lro:Project ) ] ;
+  owl:inverseOf lro:hasMember .
+
+lro:hasMember a owl:ObjectProperty ;
+  rdfs:label "has member" .
+
+#################################################################
+# 3) Geospatial Areas & Containment
+#################################################################
+
+lro:Area a owl:Class ;
   rdfs:subClassOf geo:Feature ;
+  rdfs:label "Area" ;
+  rdfs:comment "Spatial area used for planning/sampling; carries geometry/boundaries." .
+
+lro:Landscape a owl:Class ;
+  rdfs:subClassOf geo:Feature ;
+  rdfs:label "Landscape" .
+
+lro:Location a owl:Class ;
+  rdfs:subClassOf geo:Feature , dcterms:Location ;
+  rdfs:label "Location" .
+
+lro:Site a owl:Class ;
+  rdfs:subClassOf geo:Feature , lro:Area ;
   rdfs:label "Site" .
 
-lro:Farm a owl:Class ;
-  rdfs:subClassOf schema:Farm ;
-  rdfs:label "Farm" .
-
 lro:LandParcel a owl:Class ;
-  rdfs:subClassOf geo:Feature ;
+  rdfs:subClassOf geo:Feature , lro:Area ;
   rdfs:label "Land parcel" .
 
 lro:Watershed a owl:Class ;
-  rdfs:subClassOf geo:Feature ;
+  rdfs:subClassOf geo:Feature , lro:Area ;
   rdfs:label "Watershed" .
 
-lro:Location a owl:Class ;
-  rdfs:subClassOf dcterms:Location , geo:Feature ;
-  rdfs:label "Location" .
+# Farm is both an Area (for geometry) and an Organization (for members)
+lro:Farm a owl:Class ;
+  rdfs:subClassOf lro:Area , org:Organization , schema:Place ;
+  rdfs:label "Farm" .
 
-### Object properties
+# Generic transitive partonomy with inverse
+lro:hasPart a owl:ObjectProperty , owl:TransitiveProperty ;
+  rdfs:label "has part" .
+lro:partOf  a owl:ObjectProperty , owl:TransitiveProperty ;
+  rdfs:label "part of" ;
+  owl:inverseOf lro:hasPart .
+
+# Domain-specific containment (subproperties of hasPart)
+lro:hasSite a owl:ObjectProperty ;
+  rdfs:label "has site" ;
+  rdfs:domain lro:Project ;
+  rdfs:range  lro:Site ;
+  rdfs:subPropertyOf lro:hasPart .
+
+lro:hasFarm a owl:ObjectProperty ;
+  rdfs:label "has farm" ;
+  rdfs:domain lro:Project ;
+  rdfs:range  lro:Farm ;
+  rdfs:subPropertyOf lro:hasPart .
+
+# Compatibility: earlier examples used hasParcel; keep it and alias
 lro:hasParcel a owl:ObjectProperty ;
+  rdfs:label "has parcel" ;
+  rdfs:domain lro:Site ;
+  rdfs:range  lro:LandParcel ;
+  rdfs:subPropertyOf lro:hasPart .
+
+lro:hasLandParcel a owl:ObjectProperty ;
   rdfs:label "has land parcel" ;
   rdfs:domain lro:Site ;
-  rdfs:range  lro:LandParcel .
+  rdfs:range lro:LandParcel ;
+  rdfs:subPropertyOf lro:hasPart ;
+  owl:equivalentProperty lro:hasParcel .
 
-lro:locatedIn a owl:ObjectProperty ;
-  rdfs:label "located in" ;
-  rdfs:domain geo:Feature ;
-  rdfs:range  gn:Region ;
-  rdfs:subPropertyOf dcterms:spatial .
+lro:hasSiteOfFarm a owl:ObjectProperty ;
+  rdfs:label "has site (farm)" ;
+  rdfs:domain lro:Farm ;
+  rdfs:range  lro:Site ;
+  rdfs:subPropertyOf lro:hasPart .
 
-lro:hasUKHab a owl:ObjectProperty ;
-  rdfs:label "has UKHab" ;
-  rdfs:domain lro:LandParcel ;
-  rdfs:range  skos:Concept .
+# Helpful inverses (optional)
+lro:partOfSite a owl:ObjectProperty ; rdfs:label "part of site" ; owl:inverseOf lro:hasLandParcel .
+lro:partOfProject a owl:ObjectProperty ; rdfs:label "part of project" ; owl:inverseOf lro:hasSite .
+lro:partOfProjectViaFarm a owl:ObjectProperty ; rdfs:label "part of project (via farm)" ; owl:inverseOf lro:hasFarm .
+lro:partOfProgramme a owl:ObjectProperty ; rdfs:label "part of programme" ; owl:inverseOf lro:hasProject .
 
-lro:owner a owl:ObjectProperty ;
-  rdfs:label "owner" ;
-  rdfs:domain lro:LandParcel ;
-  rdfs:range  foaf:Agent .
-
-geo:hasGeometry a owl:ObjectProperty .
-geo:asWKT       a owl:DatatypeProperty .
-geo:asGeoJSON   a owl:DatatypeProperty .
-
-### Datatype properties
-lro:parcelId a owl:DatatypeProperty ;
-  rdfs:label "parcel ID" ;
-  rdfs:domain lro:LandParcel ;
-  rdfs:range  xsd:string .
-
-lro:areaHa a owl:DatatypeProperty ;
-  rdfs:label "area (hectares)" ;
-  rdfs:domain lro:LandParcel ;
-  rdfs:range  xsd:decimal .
-
-lro:conditionScore a owl:DatatypeProperty ;
-  rdfs:label "habitat condition score" ;
-  rdfs:comment "Numeric condition score for the parcel (0..1 or 0..100, choose and apply consistently)." ;
-  rdfs:domain lro:LandParcel ;
-  rdfs:range  xsd:decimal .
-
-### UKHab placeholder scheme
-lro:UKHabScheme a skos:ConceptScheme ;
-  skos:prefLabel "UK Habitat Classification (placeholder scheme)"@en ;
-  dcterms:source <https://www.ukhab.org/> .
-
-lro:UKHab_L1_Grassland a skos:Concept ;
-  skos:prefLabel "Grassland (L1)"@en ;
-  skos:topConceptOf lro:UKHabScheme ;
-  skos:inScheme   lro:UKHabScheme .
-
-lro:UKHab_ChalkGrassland a skos:Concept ;
-  skos:prefLabel "Chalk grassland"@en ;
-  skos:broader   lro:UKHab_L1_Grassland ;
-  skos:inScheme  lro:UKHabScheme .
+# Disjointness guardrails (tweak if you want overlaps)
+[] a owl:AllDisjointClasses ;
+   owl:members ( lro:Programme lro:Project lro:Site lro:LandParcel lro:Watershed ) .
 
 #################################################################
-# 3) People & Organizations
+# 4) Sampling & Observations (SOSA/SSN)
 #################################################################
 
-### Classes
-# Use FOAF/ORG; keep PII minimal
-lro:Visitor   a owl:Class ; rdfs:subClassOf foaf:Person ; rdfs:label "Visitor" .
-lro:Ecologist a owl:Class ; rdfs:subClassOf foaf:Person ; rdfs:label "Ecologist" .
-lro:Investor  a owl:Class ; rdfs:subClassOf foaf:Person ; rdfs:label "Investor" .
-lro:Farmer    a owl:Class ; rdfs:subClassOf foaf:Person ; rdfs:label "Farmer" .
-
-### Responsibility scheme (optional)
-lro:ResponsibilityScheme a skos:ConceptScheme ;
-  skos:prefLabel "Responsibility (scheme)"@en .
-
-lro:responsibility a owl:ObjectProperty ;
-  rdfs:label "responsibility" ;
-  rdfs:domain foaf:Agent ;
-  rdfs:range  skos:Concept .
-
-lro:Resp_Creator a skos:Concept ; skos:prefLabel "creator"@en ; skos:inScheme lro:ResponsibilityScheme .
-lro:Resp_Owner   a skos:Concept ; skos:prefLabel "owner"@en   ; skos:inScheme lro:ResponsibilityScheme .
-lro:Resp_Payer   a skos:Concept ; skos:prefLabel "payer"@en   ; skos:inScheme lro:ResponsibilityScheme .
-
-# For employment/affiliation use org:memberOf and org:role (from ORG)
-
-#################################################################
-# 4) Finance & Legal
-#################################################################
-
-### Classes
-lro:Invoice a owl:Class ;
-  rdfs:subClassOf schema:Invoice ;
-  rdfs:label "Invoice" .
-
-lro:MonetaryValue a owl:Class ;
-  rdfs:subClassOf qudt:QuantityValue ;
-  rdfs:label "Monetary value" .
-
-lro:LegalDocument a owl:Class ;
-  rdfs:subClassOf dcterms:Document ;
-  rdfs:label "Legal document" .
-
-lro:FinancialModel a owl:Class ;
-  rdfs:subClassOf dcterms:Document ;
-  rdfs:label "Financial model" .
-
-### Object & datatype properties
-lro:amount a owl:ObjectProperty ;
-  rdfs:label "amount (QUDT)" ;
-  rdfs:domain lro:Invoice ;
-  rdfs:range  qudt:QuantityValue .
-
-lro:relatesToProject a owl:ObjectProperty ;
-  rdfs:label "relates to project" ;
-  rdfs:domain lro:Invoice ;
-  rdfs:range  lro:Project ;
-  rdfs:subPropertyOf dcterms:subject .
-
-lro:pertainsTo a owl:ObjectProperty ;
-  rdfs:label "pertains to" ;
-  rdfs:domain lro:LegalDocument ;
-  rdfs:range  lro:Project , lro:LandParcel ;
-  rdfs:subPropertyOf dcterms:subject .
-
-#################################################################
-# 5) Ecosystem Science & Services
-#################################################################
-
-### Classes
-lro:HabitatType a owl:Class ;
-  rdfs:subClassOf envo:ENVO_00002006 ;
-  rdfs:label "Habitat type" .
-
-lro:EcosystemService  a owl:Class ; rdfs:label "Ecosystem service" .
-lro:EcosystemFunction a owl:Class ; rdfs:label "Ecosystem function" .
-lro:EcosystemValue    a owl:Class ; rdfs:label "Ecosystem value" .
-
-#################################################################
-# 6) Measurement & Monitoring (SOSA/QUDT)
-#################################################################
-
-### Classes
+# Samples
 lro:SoilSample  a owl:Class ; rdfs:subClassOf sosa:Sample ; rdfs:label "Soil sample" .
 lro:WaterSample a owl:Class ; rdfs:subClassOf sosa:Sample ; rdfs:label "Water sample" .
 lro:AirSample   a owl:Class ; rdfs:subClassOf sosa:Sample ; rdfs:label "Air sample" .
 
+# Observations
 lro:SpeciesObservation a owl:Class ;
   rdfs:subClassOf sosa:Observation ;
   rdfs:label "Species observation" .
 
-### Object properties
-lro:partOfProject a owl:ObjectProperty ;
-  rdfs:label "part of project" ;
-  rdfs:domain sosa:Observation ;
-  rdfs:range  lro:Project ;
-  rdfs:subPropertyOf dcterms:isPartOf .
+# Added back: HabitatQualityAssessment (used in earlier README diagram)
+lro:HabitatQualityAssessment a owl:Class ;
+  rdfs:subClassOf sosa:Observation ;
+  rdfs:label "Habitat quality assessment" .
 
+# Observed species linkage used previously in README
+lro:observedSpecies a owl:ObjectProperty ;
+  rdfs:label "observed species" ;
+  rdfs:domain sosa:Observation ;
+  rdfs:range  dwc:Taxon .
+
+# Explicit: an observation targets a sample (keep SOSA alignment)
+lro:observesSample a owl:ObjectProperty ;
+  rdfs:label "observes sample" ;
+  rdfs:subPropertyOf sosa:hasFeatureOfInterest ;
+  rdfs:domain sosa:Observation ;
+  rdfs:range  sosa:Sample .
+
+# Sample taken from a parcel; chain to infer higher containers
 lro:sampleOfParcel a owl:ObjectProperty ;
   rdfs:label "sample of parcel" ;
   rdfs:domain sosa:Sample ;
   rdfs:range  lro:LandParcel ;
-  rdfs:subPropertyOf sosa:isSampleOf .
+  rdfs:subPropertyOf lro:partOf .
 
-lro:observedSpecies a owl:ObjectProperty ;
-  rdfs:label "observed species (taxon)" ;
-  rdfs:domain lro:SpeciesObservation ;
-  rdfs:range  dwc:Taxon .
+# Property chain: (sampleOfParcel ∘ partOf) ⊑ partOf
+lro:partOf owl:propertyChainAxiom ( lro:sampleOfParcel lro:partOf ) .
 
-### Optional SKOS enums for observations/samples
-lro:ConfidenceScheme a skos:ConceptScheme ; skos:prefLabel "Confidence (scheme)"@en .
-lro:Conf_Low    a skos:Concept ; skos:prefLabel "low"@en    ; skos:inScheme lro:ConfidenceScheme .
-lro:Conf_Medium a skos:Concept ; skos:prefLabel "medium"@en ; skos:inScheme lro:ConfidenceScheme .
-lro:Conf_High   a skos:Concept ; skos:prefLabel "high"@en   ; skos:inScheme lro:ConfidenceScheme .
+# SOSA procedure alignment & parcel evaluation event
+lro:EvaluationMethod a owl:Class ;
+  rdfs:label "Evaluation method" ;
+  owl:equivalentClass sosa:Procedure .
 
-lro:confidence a owl:ObjectProperty ;
-  rdfs:label "confidence" ;
-  rdfs:domain sosa:Observation ;
-  rdfs:range  skos:Concept .
+lro:ParcelEvaluation a owl:Class ;
+  rdfs:subClassOf sosa:Sampling ;
+  rdfs:label "Parcel evaluation" ;
+  rdfs:comment "An evaluation/survey sampling act performed on a land parcel with a SOSA Procedure and time." .
 
-lro:SampleTypeScheme a skos:ConceptScheme ; skos:prefLabel "Sample type"@en .
-lro:SampleType_Soil  a skos:Concept ; skos:prefLabel "soil"@en  ; skos:inScheme lro:SampleTypeScheme .
-lro:SampleType_Water a skos:Concept ; skos:prefLabel "water"@en ; skos:inScheme lro:SampleTypeScheme .
-lro:SampleType_Air   a skos:Concept ; skos:prefLabel "air"@en   ; skos:inScheme lro:SampleTypeScheme .
+lro:hasEvaluation a owl:ObjectProperty ;
+  rdfs:label "has evaluation" ;
+  rdfs:domain lro:LandParcel ;
+  rdfs:range  lro:ParcelEvaluation .
 
+lro:evaluatesFeature a owl:ObjectProperty ;
+  rdfs:label "evaluates feature" ;
+  rdfs:subPropertyOf sosa:hasFeatureOfInterest ;
+  rdfs:domain lro:ParcelEvaluation ;
+  rdfs:range  lro:LandParcel .
+
+lro:usedEvaluationMethod a owl:ObjectProperty ;
+  rdfs:label "used evaluation method" ;
+  rdfs:subPropertyOf sosa:usedProcedure ;
+  rdfs:domain lro:ParcelEvaluation ;
+  rdfs:range  sosa:Procedure .
+
+lro:hasEvaluationTime a owl:ObjectProperty ;
+  rdfs:label "has evaluation time" ;
+  rdfs:subPropertyOf time:hasTime ;
+  rdfs:domain lro:ParcelEvaluation ;
+  rdfs:range  time:TemporalEntity .
+
+# Extra SOSA facet (kept)
 lro:sampleType a owl:ObjectProperty ;
   rdfs:label "sample type" ;
   rdfs:domain sosa:Sample ;
   rdfs:range  skos:Concept .
 
 #################################################################
-# 7) Documents & Metadata
+# 5) Biodiversity & Ecosystems (selected)
 #################################################################
 
-### Classes
-lro:TemplateDocument   a owl:Class ; rdfs:subClassOf dcterms:Document ; rdfs:label "Template document" .
-lro:HydrologicalModel  a owl:Class ; rdfs:subClassOf dcterms:Document ; rdfs:label "Hydrological model" .
-lro:ReportingRequirement a owl:Class ; rdfs:label "Reporting requirement" .
-dcat:Dataset a owl:Class .
+lro:Biome a owl:Class ; rdfs:label "Biome" .
+lro:Ecoregion a owl:Class ; rdfs:label "Ecoregion" .
+lro:Ecosystem a owl:Class ; rdfs:label "Ecosystem" .
+lro:Community a owl:Class ; rdfs:label "Community" .
+lro:Population a owl:Class ; rdfs:label "Population" .
+lro:Individual a owl:Class ; rdfs:label "Individual" .
 
-### Object properties
-lro:fulfillsRequirement a owl:ObjectProperty ;
-  rdfs:label "fulfills requirement" ;
-  rdfs:domain dcterms:Document ;
-  rdfs:range  lro:ReportingRequirement .
+lro:EcosystemFunction a owl:Class ; rdfs:label "Ecosystem function" .
+lro:EcosystemService  a owl:Class ; rdfs:label "Ecosystem service" .
+lro:EcosystemValue    a owl:Class ; rdfs:label "Ecosystem value" .
 
-#################################################################
-# 8) Reporting & Analytical Models
-#################################################################
-
-### Classes
-lro:EvaluationMethod a owl:Class ;
-  rdfs:subClassOf sosa:Procedure ;
-  rdfs:label "Evaluation method" .
-
-lro:HabitatQualityAssessment a owl:Class ;
-  rdfs:subClassOf sosa:Observation ;
-  rdfs:label "Habitat quality assessment" .
-
-#################################################################
-# 9) Landscapes Integration (Biome → Ecoregion → Landscape)
-#################################################################
-
-### Classes
-lro:Biome a owl:Class ;
-  rdfs:label "Biome" ;
-  rdfs:comment "Ecological biome; commonly characterized by vegetation and climate." .
-
-lro:Ecoregion a owl:Class ;
-  rdfs:label "Ecoregion" ;
-  rdfs:comment "Region within a biome; characterized by vegetation and climate." .
-
-lro:Landscape a owl:Class ;
-  rdfs:subClassOf geo:Feature ;
-  rdfs:label "Landscape" ;
-  rdfs:comment "Landscape lies within an ecoregion and includes an area feature and at least one ecosystem." .
-
-lro:Area a owl:Class ;
-  rdfs:subClassOf geo:Feature ;
-  rdfs:label "Area" ;
-  rdfs:comment "Spatial area of a landscape used for sampling; carries geometry and boundaries." .
-
-lro:SamplingProtocol a owl:Class ;
-  rdfs:subClassOf sosa:Procedure ;
-  rdfs:label "Sampling protocol" ;
-  rdfs:comment "Procedure describing sampling design and methods applied in an Area/Landscape." .
-
-lro:Ecosystem a owl:Class ;
-  rdfs:label "Ecosystem" ;
-  rdfs:comment "Biotic communities and abiotic environment considered together." .
-
-lro:Community a owl:Class ;
-  rdfs:label "Community" ;
-  rdfs:comment "Interacting assemblage of species within an area." .
-
-lro:Population a owl:Class ;
-  rdfs:label "Population" ;
-  rdfs:comment "Individuals of a species in an area; often summarized by abundance." .
-
-lro:Individual a owl:Class ;
-  rdfs:label "Individual" ;
-  rdfs:comment "Single organism; often described by species identity and counts." .
-
-### Object properties
-lro:inBiome a owl:ObjectProperty ;
-  rdfs:label "in biome" ;
-  rdfs:domain lro:Ecoregion ;
-  rdfs:range  lro:Biome ;
-  rdfs:subPropertyOf dcterms:isPartOf .
-
-lro:inEcoregion a owl:ObjectProperty ;
-  rdfs:label "in ecoregion" ;
-  rdfs:domain lro:Landscape ;
-  rdfs:range  lro:Ecoregion ;
-  rdfs:subPropertyOf dcterms:spatial .
-
-lro:hasAreaFeature a owl:ObjectProperty ;
-  rdfs:label "has area feature" ;
-  rdfs:domain lro:Landscape ;
-  rdfs:range  lro:Area .
+# Added back: alias to ENVO habitat class used earlier in README
+lro:HabitatType a owl:Class ;
+  rdfs:label "Habitat type" ;
+  owl:equivalentClass envo:ENVO_00002006 .
 
 lro:hasEcosystem a owl:ObjectProperty ;
   rdfs:label "has ecosystem" ;
   rdfs:domain lro:Landscape ;
   rdfs:range  lro:Ecosystem .
 
-lro:hasSamplingProtocol a owl:ObjectProperty ;
-  rdfs:label "has sampling protocol" ;
-  rdfs:domain lro:Area ;
-  rdfs:range  lro:SamplingProtocol ;
-  rdfs:subPropertyOf sosa:usedProcedure .
+lro:hasAreaFeature a owl:ObjectProperty ;
+  rdfs:label "has area feature" ;
+  rdfs:domain lro:Landscape ;
+  rdfs:range  lro:Area .
 
-# Part/whole (instance-level use is recommended)
-lro:partOf a owl:ObjectProperty ;
-  rdfs:label "part of" ;
-  rdfs:subPropertyOf dcterms:isPartOf .
-
-# Temporal context
-lro:hasTemporalContext a owl:ObjectProperty ;
-  rdfs:label "has temporal context" ;
-  rdfs:comment "Attach OWL-Time instant/interval to entities that require time (ecosystem/community/population/individual/ecoregion)." ;
-  rdfs:range  time:TemporalEntity ;
-  rdfs:subPropertyOf time:hasTime .
-
-# Optional: quantitative area on Landscape/Area (alongside geometry)
-lro:areaQuantity a owl:ObjectProperty ;
-  rdfs:label "area (quantity)" ;
-  rdfs:comment "Area as a QUDT quantity (e.g., hectares), in addition to geometry." ;
-  rdfs:range  qudt:QuantityValue .
-
-# Individuals linkage
+# Earlier README had a taxon linkage on individuals; keep it
 lro:taxon a owl:ObjectProperty ;
   rdfs:label "taxon" ;
   rdfs:domain lro:Individual ;
@@ -432,28 +318,106 @@ lro:count a owl:DatatypeProperty ;
   rdfs:domain lro:Individual ;
   rdfs:range  xsd:integer .
 
-### Principles as lightweight SKOS concepts (optional annotations)
-lro:PrincipleScheme a skos:ConceptScheme ; skos:prefLabel "LRO Principles"@en .
+#################################################################
+# 6) Legal & Finance
+#################################################################
 
-lro:Principle_Vegetation      a skos:Concept ; skos:prefLabel "vegetation"@en       ; skos:inScheme lro:PrincipleScheme .
-lro:Principle_Climate         a skos:Concept ; skos:prefLabel "climate"@en          ; skos:inScheme lro:PrincipleScheme .
-lro:Principle_Area            a skos:Concept ; skos:prefLabel "specific area"@en    ; skos:inScheme lro:PrincipleScheme .
-lro:Principle_SamplingDesign  a skos:Concept ; skos:prefLabel "sampling design"@en  ; skos:inScheme lro:PrincipleScheme .
-lro:Principle_SpatialBoundary a skos:Concept ; skos:prefLabel "spatial boundary"@en ; skos:inScheme lro:PrincipleScheme .
-lro:Principle_Topography      a skos:Concept ; skos:prefLabel "topography"@en       ; skos:inScheme lro:PrincipleScheme .
-lro:Principle_Watershed       a skos:Concept ; skos:prefLabel "watershed"@en        ; skos:inScheme lro:PrincipleScheme .
-lro:Principle_LandUse         a skos:Concept ; skos:prefLabel "land use"@en         ; skos:inScheme lro:PrincipleScheme .
-lro:Principle_AbioticFactors  a skos:Concept ; skos:prefLabel "abiotic factors"@en  ; skos:inScheme lro:PrincipleScheme .
-lro:Principle_SpeciesInteractions a skos:Concept ; skos:prefLabel "species interactions"@en ; skos:inScheme lro:PrincipleScheme .
-lro:Principle_Abundance       a skos:Concept ; skos:prefLabel "abundance"@en        ; skos:inScheme lro:PrincipleScheme .
-lro:Principle_Species         a skos:Concept ; skos:prefLabel "species"@en          ; skos:inScheme lro:PrincipleScheme .
-lro:Principle_Counts          a skos:Concept ; skos:prefLabel "counts"@en           ; skos:inScheme lro:PrincipleScheme .
+lro:LegalDocument a owl:Class ;
+  rdfs:subClassOf dcterms:Document ;
+  rdfs:label "Legal document" .
+
+lro:FinancialModel a owl:Class ;
+  rdfs:subClassOf dcterms:Document ;
+  rdfs:label "Financial model" .
+
+# Added back per earlier README list
+lro:HydrologicalModel a owl:Class ;
+  rdfs:subClassOf dcterms:Document ;
+  rdfs:label "Hydrological model" .
+
+lro:TemplateDocument a owl:Class ;
+  rdfs:subClassOf dcterms:Document ;
+  rdfs:label "Template document" .
+
+lro:ReportingRequirement a owl:Class ;
+  rdfs:label "Reporting requirement" .
+
+lro:fulfillsRequirement a owl:ObjectProperty ;
+  rdfs:label "fulfills requirement" ;
+  rdfs:domain dcterms:Document ;
+  rdfs:range  lro:ReportingRequirement .
+
+# Invoice
+lro:Invoice a owl:Class ;
+  rdfs:subClassOf schema:Invoice ;
+  rdfs:label "Invoice" .
+
+# Add a named subclass for money values (compat)
+lro:MonetaryValue a owl:Class ;
+  rdfs:subClassOf qudt:QuantityValue ;
+  rdfs:label "Monetary value" .
+
+lro:amount a owl:ObjectProperty ;
+  rdfs:label "amount (QUDT)" ;
+  rdfs:domain lro:Invoice ;
+  rdfs:range [ a owl:Class ; owl:unionOf ( qudt:QuantityValue lro:MonetaryValue ) ] .
+
+lro:relatesToProject a owl:ObjectProperty ;
+  rdfs:label "relates to project" ;
+  rdfs:domain lro:Invoice ;
+  rdfs:range  lro:Project .
+
+# Generic link to any chargeable item (measurement, product, area, etc.)
+lro:invoiceFor a owl:ObjectProperty ;
+  rdfs:label "invoice for" ;
+  rdfs:domain lro:Invoice ;
+  rdfs:range [ a owl:Class ;
+               owl:unionOf ( sosa:Observation sosa:Sample sosa:Procedure
+                             lro:Site lro:Farm lro:Project
+                             schema:Product schema:Service ) ] .
+
+#################################################################
+# 7) Land Parcel attributes (illustrative properties retained)
+#################################################################
+
+lro:parcelID a owl:DatatypeProperty ;
+  rdfs:label "parcel ID" ;
+  rdfs:domain lro:LandParcel ;
+  rdfs:range xsd:string .
+
+lro:owner a owl:ObjectProperty ;
+  rdfs:label "owner" ;
+  rdfs:domain lro:LandParcel ;
+  rdfs:range  foaf:Agent .
+
+lro:areaHectares a owl:DatatypeProperty ;
+  rdfs:label "area (hectares)" ;
+  rdfs:domain lro:LandParcel ;
+  rdfs:range xsd:decimal .
+
+lro:areaQuantity a owl:ObjectProperty ;
+  rdfs:label "area (quantity)" ;
+  rdfs:range qudt:QuantityValue .
+
+# Link a parcel (or area) to a UKHab concept (kept narrow for compat)
+lro:hasUKHab a owl:ObjectProperty ;
+  rdfs:label "has UKHab" ;
+  rdfs:domain lro:LandParcel ;
+  rdfs:range  skos:Concept .
+
+lro:habitatConditionScore a owl:DatatypeProperty ;
+  rdfs:label "habitat condition score" ;
+  rdfs:domain lro:LandParcel ;
+  rdfs:range xsd:decimal .
+
+#################################################################
+# 8) Non-normative hints
+#################################################################
 
 lro:hasPrinciple a owl:ObjectProperty ;
   rdfs:label "has principle" ;
   rdfs:range  skos:Concept .
 
-# Non-normative hints
 lro:Biome       rdfs:seeAlso lro:Principle_Vegetation , lro:Principle_Climate .
 lro:Ecoregion   rdfs:seeAlso lro:Principle_Vegetation , lro:Principle_Climate .
 lro:Landscape   rdfs:seeAlso lro:Principle_Area , lro:Principle_SamplingDesign , lro:Principle_SpatialBoundary ,
@@ -462,3 +426,21 @@ lro:Ecosystem   rdfs:seeAlso lro:Principle_AbioticFactors .
 lro:Community   rdfs:seeAlso lro:Principle_SpeciesInteractions .
 lro:Population  rdfs:seeAlso lro:Principle_Abundance .
 lro:Individual  rdfs:seeAlso lro:Principle_Species , lro:Principle_Counts .
+
+#################################################################
+# 9) UKHab (placeholder SKOS scheme & a couple of concepts)
+#################################################################
+
+lro:UKHabScheme a skos:ConceptScheme ;
+  skos:prefLabel "UK Habitat Classification (placeholder scheme)"@en ;
+  dcterms:source <https://www.ukhab.org/> .
+
+lro:UKHab_L1_Grassland a skos:Concept ;
+  skos:prefLabel "Grassland (L1)"@en ;
+  skos:topConceptOf lro:UKHabScheme ;
+  skos:inScheme  lro:UKHabScheme .
+
+lro:UKHab_ChalkGrassland a skos:Concept ;
+  skos:prefLabel "Chalk grassland"@en ;
+  skos:broader   lro:UKHab_L1_Grassland ;
+  skos:inScheme  lro:UKHabScheme .
