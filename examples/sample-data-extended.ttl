@@ -12,7 +12,7 @@
 
 ##### People
 ex:tim   a foaf:Person, lro:Farmer, lro:Investor ;
-  foaf:name "Tim Coates" ;
+  foaf:name "Tim Someone" ;
   lro:isMemberOf ex:GreatYellowCompany, ex:ELRProject, ex:ElmTreeFarm .
 
 ##### Organizations & projects
