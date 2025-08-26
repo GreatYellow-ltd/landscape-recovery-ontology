@@ -112,7 +112,7 @@ References: SOSA/SSN, GeoSPARQL 1.1, QUDT, OWL-Time, DOAP (example of publishing
 
 ## Diagram
 
-![Ontology diagram](docs/ontology-diagram.png)
+- See vizualisations under docs/
 
 ## Class Hierarchy (partial)
 ```
