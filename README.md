@@ -301,4 +301,4 @@ Issues and pull requests are welcome—particularly:
 
 - Affinito, F., Holzer, J. M., Fortin, M.-J., & Gonzalez, A. (2025). **Towards a unified ontology for monitoring ecosystem services.** *Ecosystem Services*. ScienceDirect article page: https://www.sciencedirect.com/science/article/pii/S2212041625000300  :contentReference[oaicite:6]{index=6}
 
-- Lepczyk, C. A., Lortie, C. J., & Anderson, L. J. (2008). **An ontology for landscapes.** *Ecological Complexity*, 5(3), 272–279. https://doi.org/10.1016/j.ecocom.2008.04.001  :contentReference[oaicite:0]{index=7}
+- Lepczyk, C. A., Lortie, C. J., & Anderson, L. J. (2008). **An ontology for landscapes.** *Ecological Complexity*, 5(3), 272–279. https://doi.org/10.1016/j.ecocom.2008.04.001  :contentReference[oaicite:7]{index=7}
