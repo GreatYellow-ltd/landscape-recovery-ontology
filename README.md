@@ -273,10 +273,24 @@ owl:Thing
 
 ## License
 
+This ontology and all original documentation are released under CC BY 4.0 (ontology & docs) and MIT (code/examples).
 - **Ontology & docs:** CC BY 4.0 (`LICENSE-CC-BY-4.0`)  
 - **Code & examples:** MIT (`LICENSE`)
 
 Rationale: Many ontologies (e.g., **AgrO**) use **CC BY 4.0** for the ontology; tooling frequently uses MIT/Apache-2.0 (e.g., **DOAP**, **OGC**). :contentReference[oaicite:7]{index=7}
+
+The LRO ontology reuses and references a number of existing vocabularies and code lists. Each retains its own licence, which applies when those terms are used:
+
+SOSA/SSN, OWL-Time – W3C Recommendations (reuse encouraged under W3C terms).
+GeoSPARQL 1.1 – OGC standard, openly reusable.
+QUDT – © QUDT.org, licensed CC BY 4.0.
+FOAF – Licensed under CC BY 1.0.
+ENVO, EUNIS, SWEET – OBO Foundry ontologies, licensed CC0 unless otherwise noted.
+FIBO – © EDM Council, licensed MIT.
+UK Habitat Classification (UKHab) – The UKHab classification scheme is free-to-use under its own EULA. This ontology references UKHab codes as identifiers only and does not redistribute the full classification tables or definitions. Users wishing to apply UKHab in production must register with the UKHab partnership and agree to their terms of use: https://ukhab.org
+
+**Disclaimer**
+Great Yellow does not claim ownership of the external vocabularies or classifications listed above. Where UKHab or other third-party schemes are referenced, it is solely to support interoperability. Users are responsible for ensuring they comply with the relevant licence terms of those vocabularies when reusing or redistributing data.
 
 ## Contributing
 
